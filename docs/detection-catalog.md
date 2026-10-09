@@ -33,7 +33,7 @@ A client generated 30 or more 401/403/404 API responses within one minute (objec
 - **Tuning:** Differentiate 401 storms (broken client) from 403/404 mixes (probing)
 - **Limitations:** Rate-based; slow enumeration stays under the threshold. ATT&CK mapping is approximate (no dedicated API-enumeration technique).
 - **Runbook:** [docs/runbooks/api.md#soc-api-001](../docs/runbooks/api.md#soc-api-001)
-- **Source file:** `rules\api.yml`
+- **Source file:** `rules/api.yml`
 
 ## SOC-API-002 - Large API Data Export
 
@@ -46,7 +46,7 @@ An export endpoint returned 50 MB or more to a caller other than the allowlisted
 - **Tuning:** Replace static size threshold with per-principal baseline
 - **Limitations:** Static 50 MB threshold; many small requests that sum to a large volume are not detected.
 - **Runbook:** [docs/runbooks/api.md#soc-api-002](../docs/runbooks/api.md#soc-api-002)
-- **Source file:** `rules\api.yml`
+- **Source file:** `rules/api.yml`
 
 ## SOC-API-003 - API Key Used From Multiple Source Addresses
 
@@ -59,7 +59,7 @@ A single API key was used from three or more source IPs within ten minutes (poss
 - **Tuning:** Issue per-runner keys or allowlist the runner CIDR for shared service keys
 - **Limitations:** Cannot distinguish legitimate fan-out from theft without a per-key baseline of expected sources.
 - **Runbook:** [docs/runbooks/api.md#soc-api-003](../docs/runbooks/api.md#soc-api-003)
-- **Source file:** `rules\api.yml`
+- **Source file:** `rules/api.yml`
 
 ## SOC-AUTH-001 - Excessive Authentication Failures Against One Account
 
@@ -72,7 +72,7 @@ Ten or more failed logins for the same account from the same source IP within fi
 - **Tuning:** Suppress known service accounts from internal subnets after owner confirmation; Raise threshold for NAT egress ranges
 - **Limitations:** Per-(IP,user) counting misses low-and-slow guessing and attacks distributed across many IPs.
 - **Runbook:** [docs/runbooks/authentication.md#soc-auth-001](../docs/runbooks/authentication.md#soc-auth-001)
-- **Source file:** `rules\auth.yml`
+- **Source file:** `rules/auth.yml`
 
 ## SOC-AUTH-002 - Password Spraying - Many Accounts From One Source
 
@@ -85,7 +85,7 @@ Failed logins against six or more distinct accounts from a single source IP with
 - **Tuning:** Allowlist authorized scanner IPs; Tune the distinct-user threshold per egress range
 - **Limitations:** Sprays that stay under six accounts per IP per 10 minutes, or rotate IPs, are not detected.
 - **Runbook:** [docs/runbooks/authentication.md#soc-auth-002](../docs/runbooks/authentication.md#soc-auth-002)
-- **Source file:** `rules\auth.yml`
+- **Source file:** `rules/auth.yml`
 
 ## SOC-AUTH-003 - Successful Login Following a Failure Burst
 
@@ -98,7 +98,7 @@ A successful login from a source IP within fifteen minutes of that IP producing 
 - **Tuning:** Correlate with account lockout policy; Exclude confirmed service-account remediation windows
 - **Limitations:** Requires the success to come from the same IP as the failures; attackers rotating IPs before the successful attempt break the link.
 - **Runbook:** [docs/runbooks/authentication.md#soc-auth-003](../docs/runbooks/authentication.md#soc-auth-003)
-- **Source file:** `rules\auth.yml`
+- **Source file:** `rules/auth.yml`
 
 ## SOC-AUTH-004 - Successful Logins From Multiple Countries Within One Hour
 
@@ -111,7 +111,7 @@ One account authenticated successfully from two or more countries within an hour
 - **Tuning:** Exclude VPN egress ranges once enumerated; Use distance/time rather than country mismatch if lat/long is available
 - **Limitations:** Country granularity only; no distance/time computation and no baseline of each user's normal locations.
 - **Runbook:** [docs/runbooks/authentication.md#soc-auth-004](../docs/runbooks/authentication.md#soc-auth-004)
-- **Source file:** `rules\auth.yml`
+- **Source file:** `rules/auth.yml`
 
 ## SOC-AUTH-005 - Privileged Account Login Outside Business Hours
 
@@ -124,7 +124,7 @@ Successful login by an adm-* account between 22:00 and 05:59 UTC.
 - **Tuning:** Join against the on-call roster / paging system; Per-user working-hours baseline instead of a global window
 - **Limitations:** Single global window in UTC; does not know individual schedules or time zones.
 - **Runbook:** [docs/runbooks/authentication.md#soc-auth-005](../docs/runbooks/authentication.md#soc-auth-005)
-- **Source file:** `rules\auth.yml`
+- **Source file:** `rules/auth.yml`
 
 ## SOC-CLOUD-001 - Cloud Audit Logging Disabled or Deleted
 
@@ -137,7 +137,7 @@ A successful API call that stops or deletes audit logging / flow logging / threa
 - **Tuning:** Require change-ticket correlation before suppressing
 - **Limitations:** Only API-level tampering is seen; if the log pipeline is disrupted outside the API, this rule cannot fire.
 - **Runbook:** [docs/runbooks/cloud.md#soc-cloud-001](../docs/runbooks/cloud.md#soc-cloud-001)
-- **Source file:** `rules\cloud.yml`
+- **Source file:** `rules/cloud.yml`
 
 ## SOC-CLOUD-002 - Cloud Console Login Without MFA
 
@@ -150,7 +150,7 @@ Successful cloud console login where multi-factor authentication was not used.
 - **Tuning:** Exclude federated principals whose IdP enforces MFA
 - **Limitations:** Relies on the provider's MFA flag being populated correctly.
 - **Runbook:** [docs/runbooks/cloud.md#soc-cloud-002](../docs/runbooks/cloud.md#soc-cloud-002)
-- **Source file:** `rules\cloud.yml`
+- **Source file:** `rules/cloud.yml`
 
 ## SOC-CLOUD-003 - Cloud IAM Administrative Policy Attached or Access Key Created For Another Principal
 
@@ -163,7 +163,7 @@ AdministratorAccess-style policy attached, or an access key created for a princi
 - **Tuning:** Allowlist the provisioning role by ARN and source
 - **Limitations:** Only the named policy pattern is covered; equivalent custom inline policies are not.
 - **Runbook:** [docs/runbooks/cloud.md#soc-cloud-003](../docs/runbooks/cloud.md#soc-cloud-003)
-- **Source file:** `rules\cloud.yml`
+- **Source file:** `rules/cloud.yml`
 
 ## SOC-CLOUD-004 - Storage Bucket Policy or ACL Grants Public Access
 
@@ -176,7 +176,7 @@ A bucket policy or ACL was changed to allow access to everyone.
 - **Tuning:** Tag intentionally public buckets and exclude by name
 - **Limitations:** Exposure is inferred from policy text at ingest; condition keys and complex principals are not evaluated.
 - **Runbook:** [docs/runbooks/cloud.md#soc-cloud-004](../docs/runbooks/cloud.md#soc-cloud-004)
-- **Source file:** `rules\cloud.yml`
+- **Source file:** `rules/cloud.yml`
 
 ## SOC-PRIV-001 - Privileged Role or Group Granted Without Change Ticket
 
@@ -189,7 +189,7 @@ A user was added to a privileged group or assigned a privileged role and no chan
 - **Tuning:** Validate ticket against the change system rather than only checking presence
 - **Limitations:** Presence of any ticket string suppresses the alert; ticket validity is not verified.
 - **Runbook:** [docs/runbooks/privilege.md#soc-priv-001](../docs/runbooks/privilege.md#soc-priv-001)
-- **Source file:** `rules\privilege.yml`
+- **Source file:** `rules/privilege.yml`
 
 ## SOC-PRIV-002 - Sudoers Modified Without Change Ticket
 
@@ -202,7 +202,7 @@ Sudo policy was modified on a host and no change ticket is attached.
 - **Tuning:** Exclude the configuration-management service principal once its runs carry a ticket tag
 - **Limitations:** Depends on the admin audit stream; direct file edits without auditd/FIM coverage are invisible.
 - **Runbook:** [docs/runbooks/privilege.md#soc-priv-002](../docs/runbooks/privilege.md#soc-priv-002)
-- **Source file:** `rules\privilege.yml`
+- **Source file:** `rules/privilege.yml`
 
 ## SOC-WEB-001 - Web Content Discovery - Many Distinct 404 Paths
 
@@ -215,7 +215,7 @@ A single client requested 15 or more distinct non-existent paths in two minutes 
 - **Tuning:** Maintain the scanner allowlist in the rule filter; Weight by user-agent and subsequent 200s
 - **Limitations:** Slow scans (<15 distinct paths per 2 minutes) and scans spread across IPs evade the threshold.
 - **Runbook:** [docs/runbooks/web.md#soc-web-001](../docs/runbooks/web.md#soc-web-001)
-- **Source file:** `rules\web.yml`
+- **Source file:** `rules/web.yml`
 
 ## SOC-WEB-002 - Web Request Containing Traversal or Injection Markers
 
@@ -228,7 +228,7 @@ Request path/query contains common path traversal, SQL injection or script injec
 - **Tuning:** Alert only when the response is 200/500, or aggregate per source
 - **Limitations:** Signature-style; trivial encodings or novel payloads are not matched. A match does not mean the attack succeeded.
 - **Runbook:** [docs/runbooks/web.md#soc-web-002](../docs/runbooks/web.md#soc-web-002)
-- **Source file:** `rules\web.yml`
+- **Source file:** `rules/web.yml`
 
 ## SOC-WEB-003 - Successful Admin Panel Access From Outside Internal Ranges
 
@@ -241,4 +241,4 @@ HTTP 200 on an /admin path from an address outside 10.0.0.0/8.
 - **Tuning:** Enumerate all VPN/jump-host egress ranges and add them to the internal filter
 - **Limitations:** Keyed on path prefix; renamed or unlisted admin endpoints are not covered.
 - **Runbook:** [docs/runbooks/web.md#soc-web-003](../docs/runbooks/web.md#soc-web-003)
-- **Source file:** `rules\web.yml`
+- **Source file:** `rules/web.yml`

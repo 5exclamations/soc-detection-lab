@@ -31,7 +31,7 @@ def catalog() -> str:
                 f"- **Known false positives:** " + "; ".join(r.doc["falsepositives"]),
                 f"- **Tuning:** " + "; ".join(r.ext.get("tuning", [])),
                 f"- **Limitations:** {r.ext['limitations']}", f"- **Runbook:** [{r.ext['runbook']}](../{r.ext['runbook']})",
-                f"- **Source file:** `{r.path.relative_to(RULES_DIR.parent)}`"]
+                f"- **Source file:** `{r.path.relative_to(RULES_DIR.parent).as_posix()}`"]
     return "\n".join(out) + "\n"
 
 
