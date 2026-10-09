@@ -92,7 +92,7 @@ detection:
 falsepositives:
   - Administrators working through an unlisted VPN or jump host
 level: high
-tags: [attack.initial-access, attack.t1190, attack.t1078]
+tags: [attack.initial-access, attack.t1078]
 x-soclab:
   rule_id: SOC-WEB-003
   runbook: docs/runbooks/web.md#soc-web-003

@@ -20,7 +20,7 @@ tags: [attack.defense-evasion, attack.t1562.008]
 x-soclab:
   rule_id: SOC-CLOUD-001
   runbook: docs/runbooks/cloud.md#soc-cloud-001
-  explanation: "{user} executed {values} from {src_ip} at {first_seen}."
+  explanation: "{user} executed {actions} from {src_ip} at {first_seen}."
   tuning: ["Require change-ticket correlation before suppressing"]
   limitations: "Only API-level tampering is seen; if the log pipeline is disrupted outside the API, this rule cannot fire."
 ---
@@ -77,7 +77,7 @@ x-soclab:
   rule_id: SOC-CLOUD-003
   runbook: docs/runbooks/cloud.md#soc-cloud-003
   escalate_privileged: true
-  explanation: "{user} performed {values} affecting {target} from {src_ip} at {first_seen}."
+  explanation: "{user} performed {actions} affecting {target} from {src_ip} at {first_seen}."
   tuning: ["Allowlist the provisioning role by ARN and source"]
   limitations: "Only the named policy pattern is covered; equivalent custom inline policies are not."
 ---
@@ -100,7 +100,7 @@ detection:
 falsepositives:
   - Intentional public static-website buckets
 level: high
-tags: [attack.collection, attack.exfiltration, attack.t1530]
+tags: [attack.collection, attack.t1530]
 x-soclab:
   rule_id: SOC-CLOUD-004
   runbook: docs/runbooks/cloud.md#soc-cloud-004

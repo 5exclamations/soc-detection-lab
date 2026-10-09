@@ -13,7 +13,7 @@ TECHNIQUES = {
     "T1098.001": "Account Manipulation: Additional Cloud Credentials", "T1098.003": "Account Manipulation: Additional Cloud Roles",
     "T1548.003": "Abuse Elevation Control Mechanism: Sudo and Sudo Caching", "T1595": "Active Scanning",
     "T1595.003": "Active Scanning: Wordlist Scanning", "T1190": "Exploit Public-Facing Application",
-    "T1213": "Data from Information Repositories", "T1567": "Exfiltration Over Web Service",
+    "T1213": "Data from Information Repositories",
     "T1530": "Data from Cloud Storage", "T1550.001": "Use Alternate Authentication Material: Application Access Token",
     "T1562.008": "Impair Defenses: Disable or Modify Cloud Logs",
 }

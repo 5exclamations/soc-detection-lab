@@ -1,0 +1,5 @@
+ALR-0013 [CRITICAL] SOC-CLOUD-003 2026-03-02T18:33:00Z  Cloud IAM Administrative Policy Attached or Access Key Created For Another Principal
+  adm-jlee performed CreateAccessKey affecting svc-backup from 203.0.113.201 at 2026-03-02T18:33:00Z. 
+  MITRE: {'techniques': ['T1098.001', 'T1098.003'], 'tactics': ['persistence', 'privilege-escalation']} 
+  Runbook: docs/runbooks/cloud.md#soc-cloud-003
+    2026-03-02T18:33:00Z cloud-000069 CreateAccessKey user=adm-jlee ip=203.0.113.201 target=svc-backup mfa=0 error=None

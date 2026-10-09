@@ -72,7 +72,7 @@ detection:
 falsepositives:
   - New legitimate integrations before they are added to the allowlist
 level: high
-tags: [attack.collection, attack.exfiltration, attack.t1213, attack.t1567]
+tags: [attack.collection, attack.t1213]
 x-soclab:
   rule_id: SOC-API-002
   runbook: docs/runbooks/api.md#soc-api-002

@@ -12,12 +12,11 @@ _Generated. Mappings mean the rule is **relevant to** the technique, not that it
 | T1110 | Brute Force | SOC-AUTH-003 |
 | T1110.001 | Password Guessing | SOC-AUTH-001 |
 | T1110.003 | Password Spraying | SOC-AUTH-002 |
-| T1190 | Exploit Public-Facing Application | SOC-WEB-002, SOC-WEB-003 |
+| T1190 | Exploit Public-Facing Application | SOC-WEB-002 |
 | T1213 | Data from Information Repositories | SOC-API-002 |
 | T1530 | Data from Cloud Storage | SOC-CLOUD-004 |
 | T1548.003 | Abuse Elevation Control Mechanism: Sudo and Sudo Caching | SOC-PRIV-002 |
 | T1550.001 | Use Alternate Authentication Material: Application Access Token | SOC-API-003 |
 | T1562.008 | Impair Defenses: Disable or Modify Cloud Logs | SOC-CLOUD-001 |
-| T1567 | Exfiltration Over Web Service | SOC-API-002 |
 | T1595 | Active Scanning | SOC-API-001 |
 | T1595.003 | Active Scanning: Wordlist Scanning | SOC-WEB-001 |

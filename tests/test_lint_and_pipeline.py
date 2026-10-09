@@ -78,3 +78,16 @@ def test_metrics_match_baseline_gate(pipeline):
     assert o["precision"] >= exp["min_precision"] and o["recall"] >= exp["min_recall"]
     assert {(f["scenario"], f["rule"]) for f in rep["false_negatives"]} == {tuple(x) for x in exp["known_false_negatives"]}
     assert not [f for f in rep["false_positives"] if f["context"].startswith(("baseline", "unexpected"))]
+
+
+def test_metric_invariants_on_real_data(pipeline):
+    rep, alerts = pipeline[3], pipeline[1]
+    o, sm = rep["overall"], rep["scenario_confusion"]
+    assert o["tp_alerts"] + o["fp_alerts"] == o["alerts"] == len(alerts)
+    assert o["detected_pairs"] + o["fn"] == o["expected_pairs"]
+    assert o["precision"] == round(o["tp_alerts"] / o["alerts"], 3)
+    assert o["recall"] == round(o["detected_pairs"] / o["expected_pairs"], 3)
+    assert len(rep["false_positives"]) == o["fp_alerts"] and len(rep["false_negatives"]) == o["fn"]
+    assert sm["tp"] + sm["fn"] + sm["fp"] + sm["tn"] == sm["scenarios"] == 25
+    assert sum(v["tp_alerts"] for v in rep["rules"].values()) == o["tp_alerts"]
+    assert sum(v["fn"] for v in rep["rules"].values()) == o["fn"]

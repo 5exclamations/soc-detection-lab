@@ -50,8 +50,8 @@
     },
     {
       "techniqueID": "T1190",
-      "score": 2,
-      "comment": "SOC-WEB-002, SOC-WEB-003"
+      "score": 1,
+      "comment": "SOC-WEB-002"
     },
     {
       "techniqueID": "T1213",
@@ -77,11 +77,6 @@
       "techniqueID": "T1562.008",
       "score": 1,
       "comment": "SOC-CLOUD-001"
-    },
-    {
-      "techniqueID": "T1567",
-      "score": 1,
-      "comment": "SOC-API-002"
     },
     {
       "techniqueID": "T1595",

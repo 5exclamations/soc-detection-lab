@@ -178,7 +178,7 @@ class Engine:
         gb = rule.doc["correlation"].get("group-by", []) if rule.kind == "correlation" else []
         ctx = _Safe(
             count=len(evs), first_seen=_fmt_ts(m.first), last_seen=_fmt_ts(m.last),
-            key=dict(zip(gb, m.key)), threshold=m.detail.get("threshold", ""),
+            actions=", ".join(dict.fromkeys(str(e['action']) for e in evs))[:120], key=dict(zip(gb, m.key)), threshold=m.detail.get("threshold", ""),
             window=m.detail.get("window", ""), distinct=len(m.detail.get("distinct_values", ()) or ()),
             values=", ".join(sorted(map(str, m.detail.get("distinct_values", ()) or ()))[:8]),
             **{k: ", ".join(map(str, v)) for k, v in entities.items()},
