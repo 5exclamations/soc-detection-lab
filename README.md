@@ -148,9 +148,11 @@ Timeline:
 ## Docker
 ```bash
 docker compose up --build          # service "lab": generate, ingest, detect, validate
-docker compose run --rm test       # service "test": pytest
+docker compose --profile test run --rm test   # service "test": pytest
 ```
 Outputs land in `./data` and `./reports` (git-ignored).
+
+_Verification status: the image was built and `docker run soclab run-all` reproduced the pipeline. After the final compose edit (test service moved behind a profile), `docker compose up --build` could not be re-run on the author's machine because the Docker daemon hit a disk I/O error (host disk nearly full). Treat the compose flow as unverified until run on a healthy host._
 
 ## CI
 `.github/workflows/ci.yml` runs on every push/PR: install, `pytest` (per-rule positive/negative fixtures, rule metadata lint, pipeline, metric definitions, regression gate on `tests/expected_metrics.json`), the end-to-end pipeline, and a check that generated docs are not stale.

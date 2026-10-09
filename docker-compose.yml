@@ -2,6 +2,7 @@ services:
   lab:          # full pipeline: generate, ingest, detect, validate
     build: .
     volumes: ["./data:/lab/data", "./reports:/lab/reports"]
-  test:         # run the test suite
+  test:         # run the test suite: docker compose --profile test run --rm test
+    profiles: [test]
     build: .
     entrypoint: ["python", "-m", "pytest", "-q"]
