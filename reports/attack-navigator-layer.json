@@ -1,8 +1,8 @@
 {
   "name": "SOC lab coverage",
   "versions": {
-    "attack": "16",
-    "navigator": "5.1.0",
+    "attack": "19",
+    "navigator": "5.3.2",
     "layer": "4.5"
   },
   "domain": "enterprise-attack",
@@ -74,11 +74,6 @@
       "comment": "SOC-API-003"
     },
     {
-      "techniqueID": "T1562.008",
-      "score": 1,
-      "comment": "SOC-CLOUD-001"
-    },
-    {
       "techniqueID": "T1595",
       "score": 1,
       "comment": "SOC-API-001"
@@ -87,6 +82,11 @@
       "techniqueID": "T1595.003",
       "score": 1,
       "comment": "SOC-WEB-001"
+    },
+    {
+      "techniqueID": "T1685.002",
+      "score": 1,
+      "comment": "SOC-CLOUD-001"
     }
   ]
 }

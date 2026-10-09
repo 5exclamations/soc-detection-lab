@@ -1,6 +1,6 @@
 # Sigma subset: compatibility and limits
 
-The engine (`soclab/sigma.py`, `soclab/engine.py`) evaluates Sigma-*style* rules. It is **not** a conformant Sigma backend and has not been validated against the official Sigma test suite or pySigma.
+The engine (`soclab/sigma.py`, `soclab/engine.py`) evaluates Sigma-*style* rules. It is **not** a conformant Sigma backend and has not been run against the official Sigma test suite. What *has* been demonstrated (2026-10-09): every rule document parses in pySigma 1.5.1 with no errors and passes pySigma's validators with no issues (`python scripts/validate_sigma.py`). Not demonstrated: conversion through any pySigma backend, or execution on a SIEM.
 
 | Feature | Status |
 |---|---|
@@ -23,4 +23,4 @@ Behavior that differs from or extends the spec
 - Batch evaluation over sorted events; no streaming, late-arrival or state expiry.
 
 ## ATT&CK mapping review
-Mappings were reviewed for fit, and `docs/mitre-mapping.md` is generated from the rule tags. Judgement calls: SOC-API-001 maps to T1595 (no exact API-enumeration technique); SOC-PRIV-002 maps sudoers edits to T1548.003 (closest fit); SOC-WEB-003 maps to T1078 only, because an authenticated admin page load is not evidence of exploitation; SOC-API-002 maps to T1213 only, because a download through the victim's own API is collection, not proof of exfiltration to an attacker service. Technique IDs should be re-checked against the current ATT&CK release before external use; the Navigator layer's `attack` version field is set to 16 as a placeholder.
+Mappings were reviewed for fit, and `docs/mitre-mapping.md` is generated from the rule tags. Judgement calls: SOC-API-001 maps to T1595 (no exact API-enumeration technique); SOC-PRIV-002 maps sudoers edits to T1548.003 (closest fit); SOC-WEB-003 maps to T1078 only, because an authenticated admin page load is not evidence of exploitation; SOC-API-002 maps to T1213 only, because a download through the victim's own API is collection, not proof of exfiltration to an attacker service. Mappings were validated on 2026-10-09 against ATT&CK Enterprise v19.2 (T1562.008, revoked, became T1685.002; the `defense-evasion` tactic was split into `stealth` / `defense-impairment`); the Navigator layer targets ATT&CK 19, layer format 4.5. Re-run `python -m soclab attack-check` after editing tags.

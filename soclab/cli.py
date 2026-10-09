@@ -105,6 +105,20 @@ def cmd_docs(a):
     docgen.write_all(); print("docs generated")
 
 
+def cmd_attack_check(a):
+    from . import attack
+    if a.stix:
+        problems = attack.check_against_stix(a.stix, write_subset=a.write_subset)
+        src = f"full catalog {a.stix}"
+    else:
+        problems, src = attack.check_rules(), "pinned subset"
+    problems += attack.check_layer(json.loads((REPORTS_DIR / "attack-navigator-layer.json").read_text()))
+    print(f"ATT&CK {attack.load_subset()['attack_version']} check against {src}:", "OK" if not problems else "")
+    for x in problems:
+        print(" -", x)
+    sys.exit(1 if problems else 0)
+
+
 def cmd_fixtures(a):
     from . import testcases
     from .paths import DATASETS_DIR
@@ -124,6 +138,7 @@ def main(argv=None):
     for n, f in (("generate", cmd_generate), ("ingest", cmd_ingest), ("detect", cmd_detect),
                  ("validate", cmd_validate), ("run-all", cmd_all), ("docs", cmd_docs), ("fixtures", cmd_fixtures)):
         sp.add_parser(n).set_defaults(fn=f)
+    s = sp.add_parser("attack-check"); s.add_argument("--stix"); s.add_argument("--write-subset", action="store_true"); s.set_defaults(fn=cmd_attack_check)
     s = sp.add_parser("alerts"); s.add_argument("--id"); s.set_defaults(fn=cmd_alerts)
     s = sp.add_parser("investigate"); s.add_argument("incident"); s.set_defaults(fn=cmd_investigate)
     s = sp.add_parser("pivot"); s.add_argument("--ip"); s.add_argument("--user"); s.add_argument("--limit", type=int, default=50); s.set_defaults(fn=cmd_pivot)

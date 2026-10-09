@@ -7,7 +7,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - run: pip install -r requirements.txt
-      - run: python -m pytest -q          # rule fixtures, metadata lint, pipeline, metric regression gate
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: python -m pytest -q          # rule fixtures, metadata lint, pipeline, ATT&CK checks, metric regression gate
+      - run: python scripts/validate_sigma.py   # official pySigma parser + validators
+      - run: python -m soclab attack-check      # technique IDs/tactics vs pinned ATT&CK subset, Navigator layer
       - run: python -m soclab run-all     # end-to-end validation report
-      - run: python -m soclab docs && git diff --exit-code docs/detection-catalog.md docs/mitre-mapping.md
+      - run: python -m soclab docs && git diff --exit-code docs/detection-catalog.md docs/mitre-mapping.md reports/attack-navigator-layer.json
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose config -q
+      - run: docker compose up --build --exit-code-from lab --abort-on-container-exit lab
+      - run: docker compose --profile test run --rm test

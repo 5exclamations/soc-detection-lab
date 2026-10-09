@@ -1,5 +1,5 @@
-INC-0022 [CRITICAL] 2026-03-04T02:10:00Z -> 2026-03-04T02:45:00Z  (multi-tactic activity (7 tactics))
-Tactics: collection, credential-access, defense-evasion, exfiltration, initial-access, persistence, privilege-escalation 
+INC-0022 [CRITICAL] 2026-03-04T02:10:00Z -> 2026-03-04T02:45:00Z  (multi-tactic activity (6 tactics))
+Tactics: collection, credential-access, defense-impairment, initial-access, persistence, privilege-escalation 
 Entities: {"src_ip": ["203.0.113.50"], "user": ["adm-mpatel"], "target": ["svc-backup2"], "api_key_id": ["key-mpatel-new"]}
 
 Timeline:

@@ -5,18 +5,10 @@ import json
 from collections import defaultdict
 
 from .paths import DOCS_DIR, RULES_DIR, REPORTS_DIR
+from . import attack
 from .sigma import load_rules
 
-TECHNIQUES = {
-    "T1110": "Brute Force", "T1110.001": "Password Guessing", "T1110.003": "Password Spraying",
-    "T1078": "Valid Accounts", "T1078.004": "Valid Accounts: Cloud Accounts", "T1098": "Account Manipulation",
-    "T1098.001": "Account Manipulation: Additional Cloud Credentials", "T1098.003": "Account Manipulation: Additional Cloud Roles",
-    "T1548.003": "Abuse Elevation Control Mechanism: Sudo and Sudo Caching", "T1595": "Active Scanning",
-    "T1595.003": "Active Scanning: Wordlist Scanning", "T1190": "Exploit Public-Facing Application",
-    "T1213": "Data from Information Repositories",
-    "T1530": "Data from Cloud Storage", "T1550.001": "Use Alternate Authentication Material: Application Access Token",
-    "T1562.008": "Impair Defenses: Disable or Modify Cloud Logs",
-}
+TECHNIQUES = {t: v['name'] for t, v in attack.load_subset()['techniques'].items()}
 
 
 def _rules():
@@ -49,7 +41,7 @@ def mitre() -> str:
         for t in r.techniques:
             by[t].append(r.rule_id)
     out = ["# ATT&CK Coverage", "", "_Generated. Mappings mean the rule is **relevant to** the technique, not that it fully covers it. "
-           "Verify IDs against the current ATT&CK release before external reporting._", "",
+           f"Validated against ATT&CK Enterprise v{attack.load_subset()['attack_version']} (see `python -m soclab attack-check`)._", "",
            "| Technique | Name | Rules |", "|---|---|---|"]
     out += [f"| {t} | {TECHNIQUES.get(t, '')} | {', '.join(v)} |" for t, v in sorted(by.items())]
     return "\n".join(out) + "\n"
@@ -60,7 +52,7 @@ def navigator() -> dict:
     for r in _rules():
         for t in r.techniques:
             by[t].append(r.rule_id)
-    return {"name": "SOC lab coverage", "versions": {"attack": "16", "navigator": "5.1.0", "layer": "4.5"},
+    return {"name": "SOC lab coverage", "versions": {"attack": attack.attack_major(), "navigator": attack.NAVIGATOR_VERSION, "layer": attack.LAYER_VERSION},
             "domain": "enterprise-attack", "description": "Techniques with at least one lab detection",
             "techniques": [{"techniqueID": t, "score": len(v), "comment": ", ".join(v)} for t, v in sorted(by.items())]}
 

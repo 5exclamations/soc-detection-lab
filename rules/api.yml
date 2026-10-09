@@ -45,7 +45,7 @@ falsepositives:
   - Client bug looping on an expired token
   - Load tests against non-production data in production
 level: medium
-tags: [attack.reconnaissance, attack.discovery, attack.t1595]
+tags: [attack.reconnaissance, attack.t1595]
 x-soclab:
   rule_id: SOC-API-001
   runbook: docs/runbooks/api.md#soc-api-001
@@ -100,7 +100,7 @@ falsepositives:
   - CI/CD runners or autoscaled workers sharing one key
   - Mobile clients roaming across networks
 level: high
-tags: [attack.credential-access, attack.defense-evasion, attack.t1550.001]
+tags: [attack.lateral-movement, attack.t1550.001]
 x-soclab:
   rule_id: SOC-API-003
   runbook: docs/runbooks/api.md#soc-api-003

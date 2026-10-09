@@ -14,3 +14,8 @@
 - Ticket checks test presence, not validity.
 - No asset or identity context (criticality, on-call roster, HR data), no user baselining, no ML.
 - Event time is trusted; the engine processes a sorted batch and does not handle late or out-of-order arrival as a streaming system would.
+
+**On evaluating against author-generated data (circularity)**
+- The scenarios, labels, rules and thresholds were written together, so rules are implicitly fitted to the generator's behaviour (e.g. a 10-failure threshold and attacks that comfortably exceed it). High precision/recall here is a regression signal, not evidence of detection quality. The scenarios were deliberately **not** altered to improve scores; the two evasion misses and five hard-negative false positives are kept.
+- Metrics use different units (alerts for precision, (scenario, rule) pairs for recall, scenarios for the confusion matrix) and are not interchangeable; see the README definitions and `tests/test_metrics.py`.
+- Meaningful validation would need real or independently authored attack data (e.g. replayed public datasets or purple-team exercises) and benign production baselines.
