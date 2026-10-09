@@ -1,0 +1,101 @@
+name: soc_web_404
+title: Web 404 Response (helper)
+id: "b177491c-a5af-5267-8404-9364bac504a7"
+status: stable
+description: 404 responses excluding the authorized internal scanner range. Helper; does not alert.
+author: soclab
+date: 2026-10-09
+logsource: {category: webserver}
+detection:
+  selection: {category: web, http_status: 404}
+  filter_scanner: {src_ip|cidr: 10.20.8.0/28}
+  condition: selection and not filter_scanner
+level: informational
+x-soclab: {rule_id: HELPER-WEB-404, alert: false}
+---
+name: soc_web_content_discovery
+title: Web Content Discovery - Many Distinct 404 Paths
+id: "05c7848a-d92d-5426-84eb-514d10ef49f8"
+status: stable
+description: A single client requested 15 or more distinct non-existent paths in two minutes (directory brute forcing).
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1595/003/"]
+logsource: {category: webserver}
+correlation:
+  type: value_count
+  rules: [soc_web_404]
+  group-by: [src_ip]
+  timespan: 2m
+  condition: {gte: 15, field: http_path}
+falsepositives:
+  - Authorized vulnerability scanners outside the allowlisted range
+  - Broken front-end build requesting many missing assets
+level: low
+tags: [attack.reconnaissance, attack.t1595.003]
+x-soclab:
+  rule_id: SOC-WEB-001
+  runbook: docs/runbooks/web.md#soc-web-001
+  explanation: "{src_ip} requested {distinct} distinct missing paths in 2m ({count} 404s, {first_seen} to {last_seen})."
+  tuning: ["Maintain the scanner allowlist in the rule filter", "Weight by user-agent and subsequent 200s"]
+  limitations: "Slow scans (<15 distinct paths per 2 minutes) and scans spread across IPs evade the threshold."
+---
+name: soc_web_attack_patterns
+title: Web Request Containing Traversal or Injection Markers
+id: "f153f9d9-1095-557e-b597-cd1a0229a335"
+status: stable
+description: Request path/query contains common path traversal, SQL injection or script injection markers.
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1190/"]
+logsource: {category: webserver}
+detection:
+  selection:
+    category: web
+    http_path|contains:
+      - "../"
+      - "..%2f"
+      - "%2e%2e"
+      - "union select"
+      - "union%20select"
+      - "' or '1'='1"
+      - "%27%20or%20"
+      - "<script"
+      - "/etc/passwd"
+      - "cmd.exe"
+  filter_scanner: {src_ip|cidr: 10.20.8.0/28}
+  condition: selection and not filter_scanner
+falsepositives:
+  - Security testing from non-allowlisted hosts
+  - Documentation or search pages that legitimately contain these strings in a query
+level: medium
+tags: [attack.initial-access, attack.t1190]
+x-soclab:
+  rule_id: SOC-WEB-002
+  runbook: docs/runbooks/web.md#soc-web-002
+  explanation: "{src_ip} sent a request containing an injection/traversal marker: {first_seen}."
+  tuning: ["Alert only when the response is 200/500, or aggregate per source"]
+  limitations: "Signature-style; trivial encodings or novel payloads are not matched. A match does not mean the attack succeeded."
+---
+name: soc_web_admin_external
+title: Successful Admin Panel Access From Outside Internal Ranges
+id: "f6d4a0df-9045-5d78-b6d5-b763e0a66ba2"
+status: stable
+description: HTTP 200 on an /admin path from an address outside 10.0.0.0/8.
+author: soclab
+date: 2026-10-09
+logsource: {category: webserver}
+detection:
+  selection: {category: web, http_path|startswith: /admin, http_status: 200}
+  filter_internal: {src_ip|cidr: 10.0.0.0/8}
+  condition: selection and not filter_internal
+falsepositives:
+  - Administrators working through an unlisted VPN or jump host
+level: high
+tags: [attack.initial-access, attack.t1190, attack.t1078]
+x-soclab:
+  rule_id: SOC-WEB-003
+  runbook: docs/runbooks/web.md#soc-web-003
+  explanation: "{src_ip} reached {count} admin page(s) successfully from an external address ({first_seen})."
+  tuning: ["Enumerate all VPN/jump-host egress ranges and add them to the internal filter"]
+  limitations: "Keyed on path prefix; renamed or unlisted admin endpoints are not covered."

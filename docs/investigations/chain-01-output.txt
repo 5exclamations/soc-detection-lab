@@ -1,0 +1,49 @@
+INC-0022 [CRITICAL] 2026-03-04T02:10:00Z -> 2026-03-04T02:45:00Z  (multi-tactic activity (7 tactics))
+Tactics: collection, credential-access, defense-evasion, exfiltration, initial-access, persistence, privilege-escalation 
+Entities: {"src_ip": ["203.0.113.50"], "user": ["adm-mpatel"], "target": ["svc-backup2"], "api_key_id": ["key-mpatel-new"]}
+
+Timeline:
+  2026-03-04T02:10:00Z auth-000437 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:10:15Z auth-000438 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:10:30Z auth-000439 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:10:45Z auth-000440 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:11:00Z auth-000441 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:11:15Z auth-000442 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:12:00Z auth-000445 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001
+  2026-03-04T02:12:15Z auth-000446 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:12:30Z auth-000447 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:12:45Z auth-000448 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:13:00Z auth-000449 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:13:15Z auth-000450 login failure user=adm-mpatel ip=203.0.113.50 country=RO mfa=1 <= SOC-AUTH-001,SOC-AUTH-003
+  2026-03-04T02:14:00Z auth-000451 login success user=adm-mpatel ip=203.0.113.50 country=RO mfa=0 <= SOC-AUTH-003,SOC-AUTH-005
+  2026-03-04T02:18:00Z web-005376 GET /admin/login -> 200 ip=203.0.113.50 ua=Mozilla/5.0 (iPhone; CPU iPhone OS 17_4) Mobile Safari/604.1 <= SOC-WEB-003
+  2026-03-04T02:18:30Z web-005377 GET /admin/users -> 200 ip=203.0.113.50 ua=Mozilla/5.0 (iPhone; CPU iPhone OS 17_4) Mobile Safari/604.1 <= SOC-WEB-003
+  2026-03-04T02:24:00Z admin-000020 role_assign actor=adm-mpatel target=svc-backup2 role=admin ticket=None host=iam-01 <= SOC-PRIV-001
+  2026-03-04T02:28:00Z cloud-000184 ConsoleLogin user=adm-mpatel ip=203.0.113.50 target=None mfa=0 error=None <= SOC-CLOUD-002
+  2026-03-04T02:30:00Z cloud-000185 CreateAccessKey user=adm-mpatel ip=203.0.113.50 target=svc-backup2 mfa=0 error=None <= SOC-CLOUD-003
+  2026-03-04T02:31:00Z cloud-000186 AttachUserPolicy user=adm-mpatel ip=203.0.113.50 target=svc-backup2 mfa=0 error=None <= SOC-CLOUD-003
+  2026-03-04T02:33:00Z cloud-000187 StopLogging user=adm-mpatel ip=203.0.113.50 target=None mfa=0 error=None <= SOC-CLOUD-001
+  2026-03-04T02:42:00Z api-003283 GET /api/v1/export/customers -> 200 key=key-mpatel-new user=adm-mpatel ip=203.0.113.50 bytes=200000000 <= SOC-API-002
+  2026-03-04T02:43:30Z api-003284 GET /api/v1/export/customers -> 200 key=key-mpatel-new user=adm-mpatel ip=203.0.113.50 bytes=200000000 <= SOC-API-002
+  2026-03-04T02:45:00Z api-003285 GET /api/v1/export/customers -> 200 key=key-mpatel-new user=adm-mpatel ip=203.0.113.50 bytes=200000000 <= SOC-API-002
+
+Alerts / runbooks:
+  ALR-0032 [high] SOC-AUTH-001: 14 failed logins for adm-mpatel from 203.0.113.50 between 2026-03-04T02:10:00Z and 2026-03-04T02:13:15Z (threshold 10 in 5m).  -> docs/runbooks/authentication.md#soc-auth-001
+  ALR-0033 [critical] SOC-AUTH-003: 203.0.113.50 produced a burst of failed logins and then authenticated successfully as adm-mpatel (15 events, 2026-03-04T02:10:00Z to 2026-03-04T02:14:00Z).  -> docs/runbooks/authentication.md#soc-auth-003
+  ALR-0034 [medium] SOC-AUTH-005: Privileged account adm-mpatel logged in from 203.0.113.50 at 2026-03-04T02:14:00Z (outside 06:00-21:59 UTC).  -> docs/runbooks/authentication.md#soc-auth-005
+  ALR-0035 [high] SOC-WEB-003: 203.0.113.50 reached 1 admin page(s) successfully from an external address (2026-03-04T02:18:00Z).  -> docs/runbooks/web.md#soc-web-003
+  ALR-0036 [high] SOC-WEB-003: 203.0.113.50 reached 1 admin page(s) successfully from an external address (2026-03-04T02:18:30Z).  -> docs/runbooks/web.md#soc-web-003
+  ALR-0037 [critical] SOC-PRIV-001: adm-mpatel granted privileged role to svc-backup2 with no change ticket at 2026-03-04T02:24:00Z.  -> docs/runbooks/privilege.md#soc-priv-001
+  ALR-0038 [critical] SOC-CLOUD-002: adm-mpatel signed in to the cloud console from 203.0.113.50 without MFA at 2026-03-04T02:28:00Z.  -> docs/runbooks/cloud.md#soc-cloud-002
+  ALR-0039 [critical] SOC-CLOUD-003: adm-mpatel performed  affecting svc-backup2 from 203.0.113.50 at 2026-03-04T02:30:00Z.  -> docs/runbooks/cloud.md#soc-cloud-003
+  ALR-0040 [critical] SOC-CLOUD-003: adm-mpatel performed  affecting svc-backup2 from 203.0.113.50 at 2026-03-04T02:31:00Z.  -> docs/runbooks/cloud.md#soc-cloud-003
+  ALR-0041 [critical] SOC-CLOUD-001: adm-mpatel executed  from 203.0.113.50 at 2026-03-04T02:33:00Z.  -> docs/runbooks/cloud.md#soc-cloud-001
+  ALR-0042 [critical] SOC-API-002: adm-mpatel downloaded 1 large export response(s) from 203.0.113.50 using key key-mpatel-new (2026-03-04T02:42:00Z).  -> docs/runbooks/api.md#soc-api-002
+  ALR-0043 [critical] SOC-API-002: adm-mpatel downloaded 1 large export response(s) from 203.0.113.50 using key key-mpatel-new (2026-03-04T02:43:30Z).  -> docs/runbooks/api.md#soc-api-002
+  ALR-0044 [critical] SOC-API-002: adm-mpatel downloaded 1 large export response(s) from 203.0.113.50 using key key-mpatel-new (2026-03-04T02:45:00Z).  -> docs/runbooks/api.md#soc-api-002
+
+Pivot ip=203.0.113.50: events by source
+   api 3 2026-03-04T02:42:00Z 2026-03-04T02:45:00Z
+   auth 15 2026-03-04T02:10:00Z 2026-03-04T02:14:00Z
+   cloud 4 2026-03-04T02:28:00Z 2026-03-04T02:33:00Z
+   web 2 2026-03-04T02:18:00Z 2026-03-04T02:18:30Z

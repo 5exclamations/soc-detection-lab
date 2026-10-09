@@ -1,0 +1,110 @@
+name: soc_cloud_logging_tamper
+title: Cloud Audit Logging Disabled or Deleted
+id: "baf24a4e-be44-5589-8c8d-4eac6997974d"
+status: stable
+description: A successful API call that stops or deletes audit logging / flow logging / threat detection.
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1562/008/"]
+logsource: {category: cloud, product: audit}
+detection:
+  selection:
+    category: cloud
+    cloud_event: [StopLogging, DeleteTrail, DeleteFlowLogs, DeleteDetector]
+    outcome: success
+  condition: selection
+falsepositives:
+  - Planned decommissioning of a trail or detector with an approved change
+level: critical
+tags: [attack.defense-evasion, attack.t1562.008]
+x-soclab:
+  rule_id: SOC-CLOUD-001
+  runbook: docs/runbooks/cloud.md#soc-cloud-001
+  explanation: "{user} executed {values} from {src_ip} at {first_seen}."
+  tuning: ["Require change-ticket correlation before suppressing"]
+  limitations: "Only API-level tampering is seen; if the log pipeline is disrupted outside the API, this rule cannot fire."
+---
+name: soc_cloud_console_no_mfa
+title: Cloud Console Login Without MFA
+id: "a7f0e920-6730-519d-9af5-c420dcd394d9"
+status: stable
+description: Successful cloud console login where multi-factor authentication was not used.
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1078/004/"]
+logsource: {category: cloud, product: audit}
+detection:
+  selection: {category: cloud, cloud_event: ConsoleLogin, outcome: success, mfa: 0}
+  condition: selection
+falsepositives:
+  - Federated/SSO sessions where MFA is enforced upstream and not reflected in the cloud log
+level: high
+tags: [attack.initial-access, attack.persistence, attack.t1078.004]
+x-soclab:
+  rule_id: SOC-CLOUD-002
+  runbook: docs/runbooks/cloud.md#soc-cloud-002
+  escalate_privileged: true
+  explanation: "{user} signed in to the cloud console from {src_ip} without MFA at {first_seen}."
+  tuning: ["Exclude federated principals whose IdP enforces MFA"]
+  limitations: "Relies on the provider's MFA flag being populated correctly."
+---
+name: soc_cloud_iam_privilege_grant
+title: Cloud IAM Administrative Policy Attached or Access Key Created For Another Principal
+id: "732ed4a8-825f-5b74-81ce-cb6e62a081bf"
+status: stable
+description: AdministratorAccess-style policy attached, or an access key created for a principal other than the caller.
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1098/001/", "https://attack.mitre.org/techniques/T1098/003/"]
+logsource: {category: cloud, product: audit}
+detection:
+  selection_policy:
+    category: cloud
+    cloud_event: [AttachUserPolicy, AttachRolePolicy, PutUserPolicy]
+    policy|contains: AdministratorAccess
+    outcome: success
+  selection_key:
+    category: cloud
+    cloud_event: CreateAccessKey
+    self_action: 0
+    outcome: success
+  condition: 1 of selection_*
+falsepositives:
+  - Provisioning pipelines creating keys on behalf of service users
+level: high
+tags: [attack.persistence, attack.privilege-escalation, attack.t1098.001, attack.t1098.003]
+x-soclab:
+  rule_id: SOC-CLOUD-003
+  runbook: docs/runbooks/cloud.md#soc-cloud-003
+  escalate_privileged: true
+  explanation: "{user} performed {values} affecting {target} from {src_ip} at {first_seen}."
+  tuning: ["Allowlist the provisioning role by ARN and source"]
+  limitations: "Only the named policy pattern is covered; equivalent custom inline policies are not."
+---
+name: soc_cloud_public_bucket
+title: Storage Bucket Policy or ACL Grants Public Access
+id: "99ecbe57-03d8-5ea3-a4bc-df88a55cf632"
+status: stable
+description: A bucket policy or ACL was changed to allow access to everyone.
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1530/"]
+logsource: {category: cloud, product: audit}
+detection:
+  selection:
+    category: cloud
+    cloud_event: [PutBucketPolicy, PutBucketAcl]
+    public_exposure: 1
+    outcome: success
+  condition: selection
+falsepositives:
+  - Intentional public static-website buckets
+level: high
+tags: [attack.collection, attack.exfiltration, attack.t1530]
+x-soclab:
+  rule_id: SOC-CLOUD-004
+  runbook: docs/runbooks/cloud.md#soc-cloud-004
+  escalate_privileged: true
+  explanation: "{user} made bucket {target} publicly accessible from {src_ip} at {first_seen}."
+  tuning: ["Tag intentionally public buckets and exclude by name"]
+  limitations: "Exposure is inferred from policy text at ingest; condition keys and complex principals are not evaluated."

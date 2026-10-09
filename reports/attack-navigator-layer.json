@@ -1,0 +1,97 @@
+{
+  "name": "SOC lab coverage",
+  "versions": {
+    "attack": "16",
+    "navigator": "5.1.0",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "Techniques with at least one lab detection",
+  "techniques": [
+    {
+      "techniqueID": "T1078",
+      "score": 4,
+      "comment": "SOC-AUTH-003, SOC-AUTH-004, SOC-AUTH-005, SOC-WEB-003"
+    },
+    {
+      "techniqueID": "T1078.004",
+      "score": 1,
+      "comment": "SOC-CLOUD-002"
+    },
+    {
+      "techniqueID": "T1098",
+      "score": 1,
+      "comment": "SOC-PRIV-001"
+    },
+    {
+      "techniqueID": "T1098.001",
+      "score": 1,
+      "comment": "SOC-CLOUD-003"
+    },
+    {
+      "techniqueID": "T1098.003",
+      "score": 1,
+      "comment": "SOC-CLOUD-003"
+    },
+    {
+      "techniqueID": "T1110",
+      "score": 1,
+      "comment": "SOC-AUTH-003"
+    },
+    {
+      "techniqueID": "T1110.001",
+      "score": 1,
+      "comment": "SOC-AUTH-001"
+    },
+    {
+      "techniqueID": "T1110.003",
+      "score": 1,
+      "comment": "SOC-AUTH-002"
+    },
+    {
+      "techniqueID": "T1190",
+      "score": 2,
+      "comment": "SOC-WEB-002, SOC-WEB-003"
+    },
+    {
+      "techniqueID": "T1213",
+      "score": 1,
+      "comment": "SOC-API-002"
+    },
+    {
+      "techniqueID": "T1530",
+      "score": 1,
+      "comment": "SOC-CLOUD-004"
+    },
+    {
+      "techniqueID": "T1548.003",
+      "score": 1,
+      "comment": "SOC-PRIV-002"
+    },
+    {
+      "techniqueID": "T1550.001",
+      "score": 1,
+      "comment": "SOC-API-003"
+    },
+    {
+      "techniqueID": "T1562.008",
+      "score": 1,
+      "comment": "SOC-CLOUD-001"
+    },
+    {
+      "techniqueID": "T1567",
+      "score": 1,
+      "comment": "SOC-API-002"
+    },
+    {
+      "techniqueID": "T1595",
+      "score": 1,
+      "comment": "SOC-API-001"
+    },
+    {
+      "techniqueID": "T1595.003",
+      "score": 1,
+      "comment": "SOC-WEB-001"
+    }
+  ]
+}

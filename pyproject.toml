@@ -1,0 +1,9 @@
+[project]
+name = "soclab"
+version = "1.0.0"
+description = "Defensive SOC lab: synthetic logs, Sigma detections, validation, investigation"
+requires-python = ">=3.10"
+dependencies = ["pyyaml>=6.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

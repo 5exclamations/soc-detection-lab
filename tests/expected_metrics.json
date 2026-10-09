@@ -1,0 +1,7 @@
+{
+  "max_false_negatives": 2,
+  "max_false_positives": 5,
+  "min_precision": 0.89,
+  "min_recall": 0.93,
+  "known_false_negatives": [["EVA-01", "SOC-AUTH-001"], ["EVA-02", "SOC-AUTH-001"]]
+}

@@ -1,0 +1,109 @@
+name: soc_api_error
+title: API Client Error Response (helper)
+id: "33385cff-dcc0-5681-b5df-d53d63ab2454"
+status: stable
+description: API calls answered with 401, 403 or 404. Helper; does not alert.
+author: soclab
+date: 2026-10-09
+logsource: {category: api}
+detection:
+  selection: {category: api, http_status: [401, 403, 404]}
+  condition: selection
+level: informational
+x-soclab: {rule_id: HELPER-API-ERR, alert: false}
+---
+name: soc_api_call
+title: API Call (helper)
+id: "6a8fe7f6-511e-5cf8-9609-fafa9be80610"
+status: stable
+description: Any API call carrying a credential identifier. Helper; does not alert.
+author: soclab
+date: 2026-10-09
+logsource: {category: api}
+detection:
+  selection: {category: api, "api_key_id|exists": true}
+  condition: selection
+level: informational
+x-soclab: {rule_id: HELPER-API-CALL, alert: false}
+---
+name: soc_api_enumeration
+title: API Enumeration - High Rate of Authorization or Not-Found Errors
+id: "7669a860-8e49-5bf8-90cb-35b41cb53c60"
+status: stable
+description: A client generated 30 or more 401/403/404 API responses within one minute (object ID walking, endpoint probing).
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1595/"]
+logsource: {category: api}
+correlation:
+  type: event_count
+  rules: [soc_api_error]
+  group-by: [src_ip]
+  timespan: 1m
+  condition: {gte: 30}
+falsepositives:
+  - Client bug looping on an expired token
+  - Load tests against non-production data in production
+level: medium
+tags: [attack.reconnaissance, attack.discovery, attack.t1595]
+x-soclab:
+  rule_id: SOC-API-001
+  runbook: docs/runbooks/api.md#soc-api-001
+  escalate_privileged: false
+  explanation: "{src_ip} triggered {count} API errors in 1m using key(s) {api_key_id} ({first_seen} to {last_seen})."
+  tuning: ["Differentiate 401 storms (broken client) from 403/404 mixes (probing)"]
+  limitations: "Rate-based; slow enumeration stays under the threshold. ATT&CK mapping is approximate (no dedicated API-enumeration technique)."
+---
+name: soc_api_bulk_export
+title: Large API Data Export
+id: "f0d307d0-1493-53fe-886a-e1c269154be7"
+status: stable
+description: An export endpoint returned 50 MB or more to a caller other than the allowlisted BI service.
+author: soclab
+date: 2026-10-09
+logsource: {category: api}
+detection:
+  selection:
+    category: api
+    http_path|startswith: /api/v1/export
+    bytes_out|gte: 50000000
+  filter_bi: {user: svc-bi, src_ip|cidr: 10.20.3.0/28}
+  condition: selection and not filter_bi
+falsepositives:
+  - New legitimate integrations before they are added to the allowlist
+level: high
+tags: [attack.collection, attack.exfiltration, attack.t1213, attack.t1567]
+x-soclab:
+  rule_id: SOC-API-002
+  runbook: docs/runbooks/api.md#soc-api-002
+  escalate_privileged: true
+  explanation: "{user} downloaded {count} large export response(s) from {src_ip} using key {api_key_id} ({first_seen})."
+  tuning: ["Replace static size threshold with per-principal baseline"]
+  limitations: "Static 50 MB threshold; many small requests that sum to a large volume are not detected."
+---
+name: soc_api_key_multi_ip
+title: API Key Used From Multiple Source Addresses
+id: "1bc54314-bb51-5d34-bf9e-aa6dd6ed00e2"
+status: experimental
+description: A single API key was used from three or more source IPs within ten minutes (possible key theft or sharing).
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1550/001/"]
+logsource: {category: api}
+correlation:
+  type: value_count
+  rules: [soc_api_call]
+  group-by: [api_key_id]
+  timespan: 10m
+  condition: {gte: 3, field: src_ip}
+falsepositives:
+  - CI/CD runners or autoscaled workers sharing one key
+  - Mobile clients roaming across networks
+level: high
+tags: [attack.credential-access, attack.defense-evasion, attack.t1550.001]
+x-soclab:
+  rule_id: SOC-API-003
+  runbook: docs/runbooks/api.md#soc-api-003
+  explanation: "Key {api_key_id} was used from {distinct} source IPs ({values}) within 10m ({first_seen} to {last_seen})."
+  tuning: ["Issue per-runner keys or allowlist the runner CIDR for shared service keys"]
+  limitations: "Cannot distinguish legitimate fan-out from theft without a per-key baseline of expected sources."

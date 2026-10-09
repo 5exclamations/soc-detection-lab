@@ -1,0 +1,52 @@
+name: soc_priv_grant_no_ticket
+title: Privileged Role or Group Granted Without Change Ticket
+id: "1ae13e3a-e74b-5fa9-ae6b-27dbb7ec274d"
+status: stable
+description: A user was added to a privileged group or assigned a privileged role and no change ticket is attached.
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1098/"]
+logsource: {category: admin, product: iam}
+detection:
+  selection:
+    category: admin
+    action: [group_add, role_assign]
+    target_role: [admin, domain-admins, root, wheel, sudo]
+    ticket: null
+  condition: selection
+falsepositives:
+  - Emergency break-glass grants where the ticket is filed afterwards
+  - Admin tooling that does not populate the ticket field
+level: high
+tags: [attack.persistence, attack.privilege-escalation, attack.t1098]
+x-soclab:
+  rule_id: SOC-PRIV-001
+  runbook: docs/runbooks/privilege.md#soc-priv-001
+  escalate_privileged: true
+  explanation: "{user} granted privileged role to {target} with no change ticket at {first_seen}."
+  tuning: ["Validate ticket against the change system rather than only checking presence"]
+  limitations: "Presence of any ticket string suppresses the alert; ticket validity is not verified."
+---
+name: soc_priv_sudoers_no_ticket
+title: Sudoers Modified Without Change Ticket
+id: "9ad2c58d-7fe1-58e4-9141-3196c503ffb9"
+status: stable
+description: Sudo policy was modified on a host and no change ticket is attached.
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1548/003/"]
+logsource: {category: admin, product: linux}
+detection:
+  selection: {category: admin, action: sudoers_modified, ticket: null}
+  condition: selection
+falsepositives:
+  - Configuration management runs that do not tag a ticket
+level: high
+tags: [attack.privilege-escalation, attack.t1548.003]
+x-soclab:
+  rule_id: SOC-PRIV-002
+  runbook: docs/runbooks/privilege.md#soc-priv-002
+  escalate_privileged: true
+  explanation: "{user} modified sudo policy on {target} without a change ticket at {first_seen}."
+  tuning: ["Exclude the configuration-management service principal once its runs carry a ticket tag"]
+  limitations: "Depends on the admin audit stream; direct file edits without auditd/FIM coverage are invisible."

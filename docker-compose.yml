@@ -1,0 +1,7 @@
+services:
+  lab:          # full pipeline: generate, ingest, detect, validate
+    build: .
+    volumes: ["./data:/lab/data", "./reports:/lab/reports"]
+  test:         # run the test suite
+    build: .
+    entrypoint: ["python", "-m", "pytest", "-q"]

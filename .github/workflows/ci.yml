@@ -1,0 +1,13 @@
+name: detections
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q          # rule fixtures, metadata lint, pipeline, metric regression gate
+      - run: python -m soclab run-all     # end-to-end validation report
+      - run: python -m soclab docs && git diff --exit-code docs/detection-catalog.md docs/mitre-mapping.md

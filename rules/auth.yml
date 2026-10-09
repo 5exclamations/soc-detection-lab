@@ -1,0 +1,188 @@
+# Authentication detections. Field names refer to the SOC-lab common schema (soclab/schema.py).
+name: soc_auth_failure
+title: Authentication Failure (helper)
+id: "e39399d8-e706-563c-988c-92b9a2bfc5f7"
+status: stable
+description: Helper selection of failed interactive logins. Used by correlation rules; does not alert.
+author: soclab
+date: 2026-10-09
+logsource: {category: authentication, product: sso}
+detection:
+  selection: {category: authentication, action: login, outcome: failure}
+  condition: selection
+level: informational
+x-soclab: {rule_id: HELPER-AUTH-FAIL, alert: false}
+---
+name: soc_auth_success
+title: Authentication Success (helper)
+id: "ddf89590-409d-510b-9a6d-8950332c2dc8"
+status: stable
+description: Helper selection of successful interactive logins. Does not alert.
+author: soclab
+date: 2026-10-09
+logsource: {category: authentication, product: sso}
+detection:
+  selection: {category: authentication, action: login, outcome: success}
+  condition: selection
+level: informational
+x-soclab: {rule_id: HELPER-AUTH-OK, alert: false}
+---
+name: soc_auth_bruteforce
+title: Excessive Authentication Failures Against One Account
+id: "0eb8359d-b223-5d26-82ea-eedb58996f79"
+status: stable
+description: >-
+  Ten or more failed logins for the same account from the same source IP within five minutes,
+  consistent with online password guessing.
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1110/001/"]
+logsource: {category: authentication, product: sso}
+correlation:
+  type: event_count
+  rules: [soc_auth_failure]
+  group-by: [src_ip, user]
+  timespan: 5m
+  condition: {gte: 10}
+falsepositives:
+  - Misconfigured service accounts or scripts retrying a stale password
+  - Users locked out behind a shared NAT address
+level: medium
+tags: [attack.credential-access, attack.t1110.001]
+x-soclab:
+  rule_id: SOC-AUTH-001
+  runbook: docs/runbooks/authentication.md#soc-auth-001
+  escalate_privileged: true
+  explanation: "{count} failed logins for {user} from {src_ip} between {first_seen} and {last_seen} (threshold {threshold} in 5m)."
+  tuning: ["Suppress known service accounts from internal subnets after owner confirmation", "Raise threshold for NAT egress ranges"]
+  limitations: "Per-(IP,user) counting misses low-and-slow guessing and attacks distributed across many IPs."
+---
+name: soc_auth_spray
+title: Password Spraying - Many Accounts From One Source
+id: "8f1839ad-7ab9-5506-b62f-1c293729f09e"
+status: stable
+description: >-
+  Failed logins against six or more distinct accounts from a single source IP within ten minutes.
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1110/003/"]
+logsource: {category: authentication, product: sso}
+correlation:
+  type: value_count
+  rules: [soc_auth_failure]
+  group-by: [src_ip]
+  timespan: 10m
+  condition: {gte: 6, field: user}
+falsepositives:
+  - Corporate NAT / VPN egress where several users mistype passwords at once
+  - Vulnerability or identity-security scanners
+level: high
+tags: [attack.credential-access, attack.t1110.003]
+x-soclab:
+  rule_id: SOC-AUTH-002
+  runbook: docs/runbooks/authentication.md#soc-auth-002
+  escalate_privileged: true
+  explanation: "{src_ip} failed to authenticate as {distinct} distinct accounts ({values}) in 10m; {count} failures total from {first_seen} to {last_seen}."
+  tuning: ["Allowlist authorized scanner IPs", "Tune the distinct-user threshold per egress range"]
+  limitations: "Sprays that stay under six accounts per IP per 10 minutes, or rotate IPs, are not detected."
+---
+name: soc_auth_failed_burst
+title: Failed Login Burst Per Source (helper)
+id: "dae06075-bd56-5d46-8c7f-8651b180122d"
+status: stable
+description: Eight or more failures from one source IP in ten minutes. Helper for the success-after-failures sequence.
+author: soclab
+date: 2026-10-09
+logsource: {category: authentication, product: sso}
+correlation:
+  type: event_count
+  rules: [soc_auth_failure]
+  group-by: [src_ip]
+  timespan: 10m
+  condition: {gte: 8}
+level: informational
+x-soclab: {rule_id: HELPER-AUTH-BURST, alert: false}
+---
+name: soc_auth_success_after_burst
+title: Successful Login Following a Failure Burst
+id: "6da9c45c-b149-5979-82d6-7b033a5a0bc1"
+status: stable
+description: >-
+  A successful login from a source IP within fifteen minutes of that IP producing eight or more
+  authentication failures. Strong indicator that guessing or spraying succeeded.
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1078/"]
+logsource: {category: authentication, product: sso}
+correlation:
+  type: temporal_ordered
+  rules: [soc_auth_failed_burst, soc_auth_success]
+  group-by: [src_ip]
+  timespan: 15m
+falsepositives:
+  - A service account whose credential was fixed after a retry storm
+  - Users behind shared NAT who eventually succeed
+level: high
+tags: [attack.credential-access, attack.initial-access, attack.t1110, attack.t1078]
+x-soclab:
+  rule_id: SOC-AUTH-003
+  runbook: docs/runbooks/authentication.md#soc-auth-003
+  escalate_privileged: true
+  explanation: "{src_ip} produced a burst of failed logins and then authenticated successfully as {user} ({count} events, {first_seen} to {last_seen})."
+  tuning: ["Correlate with account lockout policy", "Exclude confirmed service-account remediation windows"]
+  limitations: "Requires the success to come from the same IP as the failures; attackers rotating IPs before the successful attempt break the link."
+---
+name: soc_auth_multi_country
+title: Successful Logins From Multiple Countries Within One Hour
+id: "4d20049e-cbd6-5b15-9599-f3cf95b63273"
+status: experimental
+description: >-
+  One account authenticated successfully from two or more countries within an hour (impossible travel proxy).
+author: soclab
+date: 2026-10-09
+references: ["https://attack.mitre.org/techniques/T1078/"]
+logsource: {category: authentication, product: sso}
+correlation:
+  type: value_count
+  rules: [soc_auth_success]
+  group-by: [user]
+  timespan: 1h
+  condition: {gte: 2, field: src_country}
+falsepositives:
+  - Corporate VPN / split-tunnel exits in different countries
+  - Mobile carriers and CGNAT with inaccurate GeoIP
+level: medium
+tags: [attack.initial-access, attack.persistence, attack.t1078]
+x-soclab:
+  rule_id: SOC-AUTH-004
+  runbook: docs/runbooks/authentication.md#soc-auth-004
+  escalate_privileged: true
+  explanation: "{user} logged in from {distinct} countries ({values}) within one hour ({first_seen} to {last_seen}); source IPs: {src_ip}."
+  tuning: ["Exclude VPN egress ranges once enumerated", "Use distance/time rather than country mismatch if lat/long is available"]
+  limitations: "Country granularity only; no distance/time computation and no baseline of each user's normal locations."
+---
+name: soc_auth_admin_offhours
+title: Privileged Account Login Outside Business Hours
+id: "be0b3daa-1b6b-5b90-b4cd-88b7a929606f"
+status: experimental
+description: Successful login by an adm-* account between 22:00 and 05:59 UTC.
+author: soclab
+date: 2026-10-09
+logsource: {category: authentication, product: sso}
+detection:
+  selection: {category: authentication, action: login, outcome: success, user|startswith: "adm-"}
+  night:
+    - {hour_utc|lt: 6}
+    - {hour_utc|gte: 22}
+  condition: selection and night
+falsepositives:
+  - On-call engineers responding to incidents
+  - Staff working across time zones
+level: medium
+tags: [attack.initial-access, attack.persistence, attack.t1078]
+x-soclab:
+  rule_id: SOC-AUTH-005
+  runbook: docs/runbooks/authentication.md#soc-auth-005
+  explanation: "Privileged account {user} logged in from {src_ip} at {first_seen} (outside 06:00-21:59 UTC)."
+  tuning: ["Join against the on-call roster / paging system", "Per-user working-hours baseline instead of a global window"]
+  limitations: "Single global window in UTC; does not know individual schedules or time zones."
