@@ -2,7 +2,7 @@
 __pycache__/
 *.pyc
 .pytest_cache/
-data/
+/data/
 reports/validation.*
 .DS_Store
 .env

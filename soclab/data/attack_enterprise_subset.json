@@ -1,0 +1,130 @@
+{
+  "attack_version": "19.2",
+  "domain": "enterprise-attack",
+  "source": "https://github.com/mitre-attack/attack-stix-data (enterprise-attack.json, x-mitre-collection modified 2026-08-05)",
+  "note": "Subset of the official catalog limited to techniques referenced by lab rules; regenerate with: python -m soclab attack-check --stix <enterprise-attack.json> --write-subset",
+  "tactics": [
+    "collection",
+    "command-and-control",
+    "credential-access",
+    "defense-impairment",
+    "discovery",
+    "execution",
+    "exfiltration",
+    "impact",
+    "initial-access",
+    "lateral-movement",
+    "persistence",
+    "privilege-escalation",
+    "reconnaissance",
+    "resource-development",
+    "stealth"
+  ],
+  "techniques": {
+    "T1078": {
+      "name": "Valid Accounts",
+      "tactics": [
+        "initial-access",
+        "persistence",
+        "privilege-escalation",
+        "stealth"
+      ]
+    },
+    "T1078.004": {
+      "name": "Valid Accounts: Cloud Accounts",
+      "tactics": [
+        "initial-access",
+        "persistence",
+        "privilege-escalation",
+        "stealth"
+      ]
+    },
+    "T1098": {
+      "name": "Account Manipulation",
+      "tactics": [
+        "persistence",
+        "privilege-escalation"
+      ]
+    },
+    "T1098.001": {
+      "name": "Account Manipulation: Additional Cloud Credentials",
+      "tactics": [
+        "persistence",
+        "privilege-escalation"
+      ]
+    },
+    "T1098.003": {
+      "name": "Account Manipulation: Additional Cloud Roles",
+      "tactics": [
+        "persistence",
+        "privilege-escalation"
+      ]
+    },
+    "T1110": {
+      "name": "Brute Force",
+      "tactics": [
+        "credential-access"
+      ]
+    },
+    "T1110.001": {
+      "name": "Brute Force: Password Guessing",
+      "tactics": [
+        "credential-access"
+      ]
+    },
+    "T1110.003": {
+      "name": "Brute Force: Password Spraying",
+      "tactics": [
+        "credential-access"
+      ]
+    },
+    "T1190": {
+      "name": "Exploit Public-Facing Application",
+      "tactics": [
+        "initial-access"
+      ]
+    },
+    "T1213": {
+      "name": "Data from Information Repositories",
+      "tactics": [
+        "collection"
+      ]
+    },
+    "T1530": {
+      "name": "Data from Cloud Storage",
+      "tactics": [
+        "collection"
+      ]
+    },
+    "T1548.003": {
+      "name": "Abuse Elevation Control Mechanism: Sudo and Sudo Caching",
+      "tactics": [
+        "privilege-escalation"
+      ]
+    },
+    "T1550.001": {
+      "name": "Use Alternate Authentication Material: Application Access Token",
+      "tactics": [
+        "lateral-movement"
+      ]
+    },
+    "T1595": {
+      "name": "Active Scanning",
+      "tactics": [
+        "reconnaissance"
+      ]
+    },
+    "T1595.003": {
+      "name": "Active Scanning: Wordlist Scanning",
+      "tactics": [
+        "reconnaissance"
+      ]
+    },
+    "T1685.002": {
+      "name": "Disable or Modify Tools: Disable or Modify Cloud Log",
+      "tactics": [
+        "defense-impairment"
+      ]
+    }
+  }
+}
